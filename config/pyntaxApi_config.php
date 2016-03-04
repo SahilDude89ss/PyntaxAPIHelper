@@ -8,6 +8,11 @@ Pyntax\Config\Config::write('rest_config', array(
     /**
      *
      */
+    'is_every_bean_owned_by_user' => true,
+
+    /**
+     *
+     */
     'user_table_name' => 'users',
 
     /**
@@ -18,17 +23,12 @@ Pyntax\Config\Config::write('rest_config', array(
     /**
      *
      */
-    'is_every_bean_owned_by_user' => true,
-
-    /**
-     *
-     */
     'api_return_type' => 'Pyntax\Api\Response\JsonRestApiResponse',
 
     /**
-     *
+     * before_save LogicHook
      */
-    'resource_relationship' => array(
-
-    )
+    'before_save' => function($bean, $callback) {
+        call_user_func($callback, array($bean));
+    }
 ));

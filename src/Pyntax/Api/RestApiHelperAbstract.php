@@ -2,6 +2,7 @@
 namespace Pyntax\Api;
 
 use Pyntax\Api\Response\JsonRestApiResponse;
+use Pyntax\DAO\Bean\BeanInterface;
 use Pyntax\Pyntax;
 
 /**
@@ -25,6 +26,9 @@ abstract class RestApiHelperAbstract implements RestApiHelperInterface
      */
     protected $_result_rendered = null;
 
+    /**
+     * @var array|mixed
+     */
     protected $_config = [];
 
     /**
@@ -36,10 +40,9 @@ abstract class RestApiHelperAbstract implements RestApiHelperInterface
     {
         $this->_config = \Pyntax\Config\Config::read('rest_config');
 
-        $this->modelName = $modelName;
-        $this->_bean = Pyntax::getBean($modelName);
+        $this->setModelName($modelName);
 
-        if(isset($this->_config['api_return_type'])) {
+        if (isset($this->_config['api_return_type'])) {
             $this->_result_rendered = new $this->_config['api_return_type'];
         } else {
             $this->_result_rendered = new JsonRestApiResponse();
@@ -54,23 +57,36 @@ abstract class RestApiHelperAbstract implements RestApiHelperInterface
     {
         $searchResults = [];
 
-        if (!is_null($this->_bean))
-        {
-            if(isset($searchResults['id'])) {
-                $searchResults = $this->_bean->find($searchParameters['id'], true);
-            } else if (isset($searchParameters['columns'])) {
-                $searchResults = $this->_bean->find($searchParameters['columns'], true);
+        if (!is_null($this->getBean())) {
+            if (isset($searchResults['id'])) {
+                $searchResults = $this->getBean()->find($searchParameters['id'], true);
+            } else if (isset($searchParameters['searchParams'])) {
+                $searchResults = $this->getBean()->find($searchParameters['searchParams'], true);
             } else {
-                $searchResults = $this->_bean->find([], true);
+                $searchResults = $this->getBean()->find([], true);
             }
         }
 
-        return $this->_result_rendered->render($searchResults);
+        $this->_result_rendered->render($this->_result_rendered->render($searchResults));
     }
 
-    public function postResource(array $data)
+    /**
+     * This functionsaves
+     *
+     * @param array $params
+     * @return mixed
+     */
+    public function postResource(array $params)
     {
-        // TODO: Implement postResource() method.
+        $dataInPost = json_decode(file_get_contents('php://input'), true);
+        foreach ($dataInPost as $_column => $_value) {
+            $this->_bean->{$_column} = $_value;
+        }
+
+        $newId = $this->getBean()->save();
+        $this->setModelName($this->getModelName());
+
+        $this->_result_rendered->render($this->getBean()->find($newId, true));
     }
 
     public function putResource($id, array $data)
@@ -83,5 +99,28 @@ abstract class RestApiHelperAbstract implements RestApiHelperInterface
         // TODO: Implement deleteResource() method.
     }
 
+    /**
+     * @return BeanInterface
+     */
+    public function getBean()
+    {
+        return $this->_bean;
+    }
 
+    /**
+     * @return null|string
+     */
+    public function getModelName()
+    {
+        return $this->modelName;
+    }
+
+    /**
+     * @param null|string $modelName
+     */
+    public function setModelName($modelName)
+    {
+        $this->modelName = $modelName;
+        $this->_bean = Pyntax::getBean($this->getModelName());
+    }
 }

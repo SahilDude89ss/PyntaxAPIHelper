@@ -6,7 +6,7 @@ namespace Pyntax\Api\Response;
  * Class RestApiResponseAbstract
  * @package Pyntax\Api\Response
  */
-abstract class RestApiResponseAbstract implements RestApiResponse
+abstract class RestApiResponseAbstract implements RestApiResponseInterface
 {
     /**
      * RestApiResponseAbstract constructor.

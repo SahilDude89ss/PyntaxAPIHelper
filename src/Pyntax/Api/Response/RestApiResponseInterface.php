@@ -6,7 +6,7 @@ namespace Pyntax\Api\Response;
  * Interface RestApiResponse
  * @package Pyntax\Api\Response
  */
-interface RestApiResponse
+interface RestApiResponseInterface
 {
     /**
      * @param $data

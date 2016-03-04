@@ -14,10 +14,10 @@ interface RestApiHelperInterface
     public function getResource($searchParameters = array());
 
     /**
-     * @param array $data
+     * @param array $params
      * @return mixed
      */
-    public function postResource(array $data);
+    public function postResource(array $params);
 
     /**
      * @param $id
