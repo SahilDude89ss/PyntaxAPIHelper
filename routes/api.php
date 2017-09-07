@@ -14,4 +14,4 @@
 Route::get('/api/{resource}/{id?}', \Pyntax\Http\Controllers\Api\Resources\GetController::class . '@getResource');
 Route::post('/api/{resource}', \Pyntax\Http\Controllers\Api\Resources\PostController::class . '@createResource');
 Route::put('/api/{resource}', \Pyntax\Http\Controllers\Api\Resources\PutController::class . '@updateResource');
-Route::delete('/api/{resource}', \Pyntax\Http\Controllers\Api\Resources\DeleteController::class . '@deleteResource');
+Route::delete('/api/{resource}/{id}', \Pyntax\Http\Controllers\Api\Resources\DeleteController::class . '@deleteResource');

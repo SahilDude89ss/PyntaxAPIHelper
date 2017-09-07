@@ -3,6 +3,9 @@
 namespace Pyntax\Http\Controllers\Api\Resources;
 
 use App\Http\Controllers\Controller;
+use Pyntax\Traits\ActiveResource;
+use Pyntax\Traits\ConfigResource;
+use Pyntax\Traits\ServiceForResource;
 
 /**
  * Class ResourceController
@@ -10,23 +13,24 @@ use App\Http\Controllers\Controller;
  */
 class ResourceController extends Controller
 {
-    /**
-     * @return bool
-     */
-    protected function checkIfResourceIsActive()
-    {
-        // Lets get the resource name
-        $resourceName = request('resource');
+    use ActiveResource, ConfigResource, ServiceForResource;
 
-        // If no resource was found in the route just return false.
-        if (empty($resourceName)) {
-            return false;
+    /**
+     * @param null $resourceName
+     * @return \Illuminate\Foundation\Application|mixed|null
+     */
+    protected function getResourceService($resourceName = null)
+    {
+        if (is_null($resourceName)) {
+            // Les load the resource name
+            $resourceName = request('resource');
         }
 
-        // Lets check if we have this resource in the active_resource array in the config.
-        $activeResources = config('pyntax-api-helper.active_resources');
+        // If we have a resource return the Service.
+        if (!empty($resourceName)) {
+            return $this->loadServiceForGivenResource($resourceName);
+        }
 
-        // We are loading all the active resource from the config and check if they can be returned.
-        return !empty($activeResources) && in_array(array_keys($activeResources), $resourceName);
+        return null;
     }
 }

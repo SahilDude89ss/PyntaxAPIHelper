@@ -3,6 +3,9 @@
 namespace Pyntax\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Pyntax\Repositories\EloquentRepository;
+use Pyntax\Services\Service;
+use Pyntax\Traits\ConfigResource;
 
 /**
  * Class PyntaxApiServiceProvider
@@ -10,6 +13,7 @@ use Illuminate\Support\ServiceProvider;
  */
 class PyntaxApiServiceProvider extends ServiceProvider
 {
+    use ConfigResource;
 
     /**
      * Bootstrap any application services.
@@ -21,10 +25,50 @@ class PyntaxApiServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../../config/pyntax-api-helper.php' => config_path('pyntax-api-helper'),
         ]);
-
-        $this->loadRoutesFrom('/../../routes/api.php');
     }
 
+    /**
+     * This function register all the Dynamic Services and Repositories.
+     */
+    protected function registerAllDynamicRepositoriesAndServices()
+    {
+        // Lets load all the Configs.
+        $allResourceConfig = $this->loadConfig();
+
+        // Lets load all the Active Resources.
+        if (!empty($allResourceConfig) && !empty($allResourceConfig['activeResources'])) {
+
+            // Loop through all the Active resources.
+            foreach ($allResourceConfig['activeResources'] as $activeResourceName => $activeResource) {
+
+                // Lets load the repository
+                $repository = $activeResource['repository'];
+
+                // If we don't have a Repository registered.
+                if (empty($activeResource['repository'])) {
+                    // Lets check if it has a Model
+                    if (!empty($activeResource['model'])) {
+                        // ToDo: We should be able to create Cache or some other kind of Repository
+                        // Lets crate an eloquent repo.
+                        $repository = !empty($activeResource['repository']) ? $activeResource : new EloquentRepository($activeResource['model']);
+                    }
+                }
+
+                // If we don't have a Service and We already have a service.
+                if (empty($activeResource['service']) && !empty($repository)) {
+                    $this->app->singleton('Pyntax\Services\\' . $activeResourceName, function () use ($repository) {
+                        // If the repository is just a String loaded from the Config, lets convert into an Object now.
+                        if (is_string($repository)) {
+                            $repository = app($repository);
+                        }
+
+                        // Lets register this service now.
+                        return new Service($repository);
+                    });
+                }
+            }
+        }
+    }
 
     /**
      * Register any application services.
@@ -38,5 +82,9 @@ class PyntaxApiServiceProvider extends ServiceProvider
     public function register()
     {
         // We would need to register all the routes here.
+        $this->loadRoutesFrom('/../../routes/api.php');
+
+        // We need to register Dynamic Services and Repositories on the basis of the Config passed.
+        $this->registerAllDynamicRepositoriesAndServices();
     }
 }

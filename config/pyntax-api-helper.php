@@ -1,16 +1,17 @@
 <?php
 
 return [
-    'use_cache' => false,
+    'useCache' => false,
 
-    'active_resources' => [
+    'activeResources' => [
 
         // ... this is where we list all the resources which can be rendered using the API Helper.
 
         'users' => [
             'model' => \App\User::class,
             'service' => null,
-            'repository' => null
+            'repository' => null,
+            'isAuthProtected' => false
         ]
     ]
 ];
