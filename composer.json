@@ -1,18 +1,18 @@
 {
-  "name": "pyntax/api-package",
-  "autoload": {
-    "psr-4": {
-      "Pyntax\\": "src/Pyntax/"
+    "name": "pyntax/api-package",
+    "autoload": {
+        "psr-4": {
+            "Pyntax\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Sahil Sharma",
+            "email": "SahilDude89ss@gmail.com"
+        }
+    ],
+    "require": {
+        "laravel/laravel": "5.4.*",
+        "illuminate/support": "^5.4"
     }
-  },
-  "authors": [
-    {
-      "name": "Sahil Sharma",
-      "email": "SahilDude89ss@gmail.com"
-    }
-  ],
-  "require": {
-    "pyntax/config": "^1.0",
-    "pyntax/pyntax" : "0.9.*"
-  }
 }
