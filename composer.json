@@ -1,5 +1,5 @@
 {
-    "name": "pyntax/api-package",
+    "name": "pyntax/laravel-pyntax-rest-api-helper",
     "autoload": {
         "psr-4": {
             "Pyntax\\": "src/"
