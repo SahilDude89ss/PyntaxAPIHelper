@@ -19,5 +19,5 @@ interface EloquentRepository extends Repository
     /**
      * @return Model
      */
-    function getModel(): Model;
+    function getModel();
 }

@@ -13,7 +13,7 @@ use Pyntax\Traits\ServiceForResource;
  */
 class ResourceController extends Controller
 {
-    use ActiveResource, ConfigResource, ServiceForResource;
+    use ServiceForResource;
 
     /**
      * @param null $resourceName

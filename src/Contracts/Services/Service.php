@@ -20,5 +20,5 @@ interface Service extends CRUD
     /**
      * @return Repository
      */
-    function getRepository(): Repository;
+    function getRepository();
 }

@@ -29,7 +29,7 @@ abstract class AbstractService implements Service
     /**
      * @return Repository
      */
-    function getRepository(): Repository
+    function getRepository()
     {
         return $this->repository;
     }
@@ -52,7 +52,7 @@ abstract class AbstractService implements Service
      */
     function find($where = [], $limit = 25, $offset = 0)
     {
-        return $this->getRepository()->get($where, $limit, $offset);
+        return $this->getRepository()->find($where, $limit, $offset);
     }
 
     /**

@@ -28,7 +28,7 @@ class EloquentRepository extends AbstractRepository implements EloquentRepositor
     /**
      * @return Model
      */
-    function getModel(): Model
+    function getModel()
     {
         return $this->model;
     }
