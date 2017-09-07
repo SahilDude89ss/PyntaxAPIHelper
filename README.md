@@ -17,3 +17,6 @@ This library will create the following routes.
 
 The library will use Eloquent models out of the box to create the above functionality. We wan also turn on the cache,
 which can make the delivering the resource a lot faster.
+
+# License
+The Pyntax API Helper is open-sourced software licensed under the MIT license.
