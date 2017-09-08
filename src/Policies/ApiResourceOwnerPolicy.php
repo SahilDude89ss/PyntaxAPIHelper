@@ -31,14 +31,7 @@ class ApiResourceOwnerPolicy
      */
     public function view($user, $resource)
     {
-        // Lets load the authProtectedForeignKey
-        $authProtectedForeignKey = $this->loadAuthProtectedForeignKey();
-
-        if (!empty($authProtectedForeignKey)) {
-            return $user->id == $resource->{$authProtectedForeignKey};
-        }
-
-        return true;
+        return $this->checkIfResourceIfOwnerByTheUser($user, $resource);
     }
 
     /**
@@ -48,14 +41,7 @@ class ApiResourceOwnerPolicy
      */
     public function update($user, $resource)
     {
-        // Lets load the authProtectedForeignKey
-        $authProtectedForeignKey = $this->loadAuthProtectedForeignKey();
-
-        if (!empty($authProtectedForeignKey)) {
-            return $user->id == $resource->{$authProtectedForeignKey};
-        }
-
-        return true;
+        return $this->checkIfResourceIfOwnerByTheUser($user, $resource);
     }
 
     /**
@@ -65,13 +51,25 @@ class ApiResourceOwnerPolicy
      */
     public function delete($user, $resource)
     {
+        return $this->checkIfResourceIfOwnerByTheUser($user, $resource);
+    }
+
+    /**
+     *
+     * @param $user
+     * @param $resource
+     *
+     * @return bool
+     */
+    protected function checkIfResourceIfOwnerByTheUser($user, $resource)
+    {
         // Lets load the authProtectedForeignKey
         $authProtectedForeignKey = $this->loadAuthProtectedForeignKey();
 
-        if (!empty($authProtectedForeignKey)) {
+        if (!empty($authProtectedForeignKey) && !empty($resource->{$authProtectedForeignKey})) {
             return $user->id == $resource->{$authProtectedForeignKey};
         }
 
-        return true;
+        return false;
     }
 }
