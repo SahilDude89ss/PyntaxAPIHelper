@@ -19,7 +19,7 @@ trait ConfigResource
         $activeResources = $activeResources['activeResources'];
 
         // We are loading all the active resource from the config and check if they can be returned.
-        return !empty($activeResources) && in_array($resourceName,array_keys($activeResources)) ? $activeResources[$resourceName] : [];
+        return !empty($activeResources) && in_array($resourceName, array_keys($activeResources)) ? $activeResources[$resourceName] : [];
     }
 
     /**
@@ -28,5 +28,15 @@ trait ConfigResource
     protected function loadConfig()
     {
         return config('pyntax-api-helper');
+    }
+
+    /**
+     * @return string
+     */
+    protected function loadAuthProtectedForeignKey()
+    {
+        $allConfig = $this->loadConfig();
+
+        return $allConfig['policies']['authProtectedForeignKey'] ?? 'users_id';
     }
 }

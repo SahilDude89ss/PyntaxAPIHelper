@@ -11,7 +11,17 @@ return [
             'model' => \App\User::class,
             'service' => null,
             'repository' => null,
-            'isAuthProtected' => false
-        ]
+            'isAuthProtected' => false,
+            // 'policyName' => 'authPolicy'
+        ],
+
+
+    ],
+
+    'policies' => [
+//        'authPolicy' => [
+//
+//        ]
+        'authProtectedForeignKey' => 'users_id'
     ]
 ];

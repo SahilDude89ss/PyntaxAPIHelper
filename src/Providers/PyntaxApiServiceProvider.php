@@ -2,7 +2,9 @@
 
 namespace Pyntax\Providers;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Pyntax\Policies\ApiResourceOwnerPolicy;
 use Pyntax\Repositories\EloquentRepository;
 use Pyntax\Services\Service;
 use Pyntax\Traits\ConfigResource;
@@ -25,6 +27,28 @@ class PyntaxApiServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../../config/pyntax-api-helper.php' => config_path('pyntax-api-helper.php'),
         ]);
+
+        $this->registerPoliciesForActiveResources();
+    }
+
+    protected function registerPoliciesForActiveResources()
+    {
+        // Lets load all the Configs.
+        $allResourceConfig = $this->loadConfig();
+
+        // Lets load all the Active Resources.
+        if (!empty($allResourceConfig) && !empty($allResourceConfig['activeResources'])) {
+
+            // Loop through all the Active resources.
+            foreach ($allResourceConfig['activeResources'] as $activeResourceName => $activeResource) {
+
+                // Lets check if any of then have a Policy specified.
+                if (!empty($activeResource['isAuthProtected']) && $activeResource['isAuthProtected'] == true) {
+                    // Lets create a generic ApiResourceOwnerPolicy
+                    Gate::resource($activeResourceName, ApiResourceOwnerPolicy::class);
+                }
+            }
+        }
     }
 
     /**
