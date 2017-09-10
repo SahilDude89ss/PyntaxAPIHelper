@@ -66,8 +66,11 @@ class ApiResourceOwnerPolicy
         // Lets load the authProtectedForeignKey
         $authProtectedForeignKey = $this->loadAuthProtectedForeignKey();
 
+        // Lets get the Primary Key for the user
+        $userPrimaryKey = $user->getKey();
+
         if (!empty($authProtectedForeignKey) && !empty($resource->{$authProtectedForeignKey})) {
-            return $user->id == $resource->{$authProtectedForeignKey};
+            return $user->{$userPrimaryKey} == $resource->{$authProtectedForeignKey};
         }
 
         return false;
