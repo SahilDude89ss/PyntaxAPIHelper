@@ -31,6 +31,9 @@ class PyntaxApiServiceProvider extends ServiceProvider
         $this->registerPoliciesForActiveResources();
     }
 
+    /**
+     *
+     */
     protected function registerPoliciesForActiveResources()
     {
         // Lets load all the Configs.
@@ -45,7 +48,12 @@ class PyntaxApiServiceProvider extends ServiceProvider
                 // Lets check if any of then have a Policy specified.
                 if (!empty($activeResource['isAuthProtected']) && $activeResource['isAuthProtected'] == true) {
                     // Lets create a generic ApiResourceOwnerPolicy
-                    Gate::resource($activeResourceName, ApiResourceOwnerPolicy::class);
+
+                    // We Can not use the ::resource class as we have different Controller
+                    Gate::define($activeResourceName . "-create", ApiResourceOwnerPolicy::class . '@create');
+                    Gate::define($activeResourceName . "-view", ApiResourceOwnerPolicy::class . '@view');
+                    Gate::define($activeResourceName . "-update", ApiResourceOwnerPolicy::class . '@update');
+                    Gate::define($activeResourceName . "-delete", ApiResourceOwnerPolicy::class . '@delete');
                 }
             }
         }
@@ -76,16 +84,21 @@ class PyntaxApiServiceProvider extends ServiceProvider
                     // ToDo: We should be able to create Cache or some other kind of Repository
                     // Lets crate an eloquent repo.
 
-                    $this->app->singleton('Pyntax\Repositories\\' . ucfirst(strtolower($activeResourceName)), function () use ($model) {
-                        return new EloquentRepository($model);
+                    $repositoryName = 'Pyntax\Repositories\\' . ucfirst(camel_case(strtolower($activeResourceName)));
+
+                    $this->app->singleton($repositoryName, function () use ($model, $activeResourceName) {
+                        $repositoryInstance = new EloquentRepository($model);
+                        $repositoryInstance->setResourceName($activeResourceName);
+
+                        return $repositoryInstance;
                     });
 
-                    $repository = app('Pyntax\Repositories\\' . ucfirst(strtolower($activeResourceName)));
+                    $repository = app($repositoryName);
                 }
 
                 // If we don't have a Service and We already have a service.
                 if (empty($activeResource['service']) && !empty($repository)) {
-                    $this->app->singleton('Pyntax\Services\\' . ucfirst(strtolower($activeResourceName)), function () use ($repository) {
+                    $this->app->singleton('Pyntax\Services\\' . ucfirst(camel_case(strtolower($activeResourceName))), function () use ($repository) {
                         // If the repository is just a String loaded from the Config, lets convert into an Object now.
                         if (is_string($repository)) {
                             $repository = app($repository);

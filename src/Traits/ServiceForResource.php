@@ -37,7 +37,7 @@ trait ServiceForResource
 
             // If we have a valid repository lets return the Service.
             if (!empty($repository)) {
-                return app('Pyntax\Services\\' . ucfirst(strtolower($resourceName)));
+                return app('Pyntax\Services\\' . ucfirst(camel_case(strtolower($resourceName))));
             }
         }
 
@@ -62,7 +62,7 @@ trait ServiceForResource
             }
 
             // The resource is active but we don't have a Repository registered in the config.
-            return app('Pyntax\Repositories\\' . ucfirst(strtolower($resourceName)));
+            return app('Pyntax\Repositories\\' . ucfirst(camel_case(strtolower($resourceName))));
         }
 
         return null;

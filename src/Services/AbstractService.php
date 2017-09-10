@@ -3,6 +3,7 @@
 namespace Pyntax\Services;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
 use Pyntax\Contracts\Repositories\Repository;
 use Pyntax\Contracts\Services\Service;
 
@@ -40,7 +41,12 @@ abstract class AbstractService implements Service
      */
     function get($id)
     {
-        return $this->getRepository()->get($id);
+        $record = $this->getRepository()->get($id);
+        if (Gate::allows($this->getRepository()->getResourceName() . "-view", $record)) {
+            return $record;
+        }
+
+        return false;
     }
 
     /**
@@ -52,7 +58,16 @@ abstract class AbstractService implements Service
      */
     function find($where = [], $limit = 25, $offset = 0)
     {
-        return $this->getRepository()->find($where, $limit, $offset);
+        $records = $this->getRepository()->find($where, $limit, $offset);
+
+        // Lets check if we can view this record.
+        if (sizeof($records) > 0) {
+            if (Gate::allows($this->getRepository()->getResourceName() . "-view", $records[0])) {
+                return $records;
+            }
+        }
+
+        return [];
     }
 
     /**
@@ -61,7 +76,11 @@ abstract class AbstractService implements Service
      */
     function create(array $data)
     {
-        return $this->getRepository()->create($data);
+        if (Gate::allows($this->getRepository()->getResourceName() . "-create")) {
+            return $this->getRepository()->create($data);
+        }
+
+        return false;
     }
 
     /**
@@ -71,15 +90,33 @@ abstract class AbstractService implements Service
      */
     function update($id, array $data)
     {
-        return $this->getRepository()->update($id, $data);
+        // Lets load the record first
+        $record = $this->get($id);
+
+        if (!empty($record)) {
+            if (Gate::allows($this->getRepository()->getResourceName() . "-update", $record)) {
+                return $this->getRepository()->update($id, $data);
+            }
+        }
+
+        return false;
     }
 
     /**
      * @param $idOrWhere
-     * @return mixed
+     * @return bool|mixed
      */
     function delete($idOrWhere)
     {
-        return $this->getRepository()->delete($idOrWhere);
+        // Lets load the record first
+        $record = $this->get($idOrWhere);
+
+        if (!empty($record)) {
+            if (Gate::allows($this->getRepository()->getResourceName() . "-delete", $record)) {
+                return $this->getRepository()->delete($idOrWhere);
+            }
+        }
+
+        return false;
     }
 }

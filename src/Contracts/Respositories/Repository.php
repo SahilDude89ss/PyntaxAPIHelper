@@ -10,5 +10,14 @@ use Pyntax\Contracts\CRUD;
  */
 interface Repository extends CRUD
 {
+    /**
+     * @param $resourceName
+     * @return mixed
+     */
+    function setResourceName($resourceName);
 
+    /**
+     * @return string
+     */
+    function getResourceName();
 }

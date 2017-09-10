@@ -55,6 +55,7 @@ class ApiResourceOwnerPolicy
     }
 
     /**
+     * This function is used to check if the Auth is protected.
      *
      * @param $user
      * @param $resource
@@ -63,16 +64,30 @@ class ApiResourceOwnerPolicy
      */
     protected function checkIfResourceIfOwnerByTheUser($user, $resource)
     {
-        // Lets load the authProtectedForeignKey
-        $authProtectedForeignKey = $this->loadAuthProtectedForeignKey();
+        // Lets load the config for the given resource
+        $resourceConfig = $this->getResourceConfigByClass(get_class($resource));
 
-        // Lets get the Primary Key for the user
-        $userPrimaryKey = $user->getKey();
+        if (!empty($resourceConfig)) {
+            if (!empty($resourceConfig['isAuthProtected']) && $resourceConfig['isAuthProtected']) {
+                // Lets load the authProtectedForeignKey
+                $authProtectedForeignKey = $this->loadAuthProtectedForeignKey();
 
-        if (!empty($authProtectedForeignKey) && !empty($resource->{$authProtectedForeignKey})) {
-            return $user->{$userPrimaryKey} == $resource->{$authProtectedForeignKey};
+                // Lets get the Primary Key for the user
+                $userPrimaryKey = $user->getKey();
+
+                if (!empty($authProtectedForeignKey) && !empty($resource->{$authProtectedForeignKey})) {
+                    return $user->{$userPrimaryKey} == $resource->{$authProtectedForeignKey};
+                }
+
+                // Lets return the resource as false.
+                return false;
+            }
+
+            // Lets return the auth as true
+            return true;
         }
 
-        return false;
+        // Lets return the auth as true
+        return true;
     }
 }
